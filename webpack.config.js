@@ -1,29 +1,39 @@
-
-'use strict';
-
 const webpack = require('webpack');
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+const dev = process.env.NODE_ENV !== 'production';
 
-const developmentConfig = {
-  devtool: 'cheap-module-eval-source-map',
+console.log('dev is ', dev);
 
-  entry: ['babel-polyfill', './src/app'],
+const commonConfig = {
+  devtool: dev ? 'cheap-module-eval-source-map' : false,
+  mode: dev ? 'development' : 'production',
+  context: path.resolve(__dirname, 'src'),
+  entry: './app',
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: "bundle.js"
+    filename: "bundle.js",
   },
 
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx'],
+    alias: {}
   },
 
   module: {
     rules: [
       {
         test: /\.css$/,
-        use: [ 'style-loader', 'css-loader' ]
+        use: [
+          'css-hot-loader',
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {sourceMap: dev}
+          }
+        ]
       },
 
       {
@@ -33,7 +43,7 @@ const developmentConfig = {
       },
 
       {
-        test: /\.(jpg|png|gif|svg)$/,
+        test: /\.(jpe?g|png|gif|svg)$/,
         loader: 'file-loader',
         options: {
           name: '[path][name].[ext]'
@@ -43,25 +53,29 @@ const developmentConfig = {
   },
 
   plugins: [
+    new webpack.DefinePlugin({
+      NODE_ENV: JSON.stringify(process.env.NODE_ENV)
+    }),
     new webpack.NoEmitOnErrorsPlugin(),
-    new FriendlyErrorsWebpackPlugin()
+    new MiniCssExtractPlugin({filename: 'style.css'}),
+    new HtmlWebpackPlugin({template: 'index.html'}),
+    new webpack.HotModuleReplacementPlugin()
   ],
 
   devServer: {
-    //stats: 'errors-only',
-    host: process.env.HOST,
-    port: process.env.PORT,
-
-    quiet: true,
+    host: 'localhost',
+    port: 3002,
+    contentBase: path.resolve(__dirname, 'build'),
+    hot: true,
 
     watchOptions: {
       aggregateTimeout: 300,
+      ignore: /node_modules/,
       poll: 100
     }
   }
 };
 
 module.exports = env => {
-  console.log('environment', env);
-  return developmentConfig;
+  return commonConfig;
 };
