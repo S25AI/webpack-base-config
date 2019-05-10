@@ -1,0 +1,36 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+html, body {
+  min-height: 100%;
+}
+
+body {
+  font: 1.6rem/1 Arial, Helvetica, sans-serif;
+  background: #232223;
+  color: white;
+}
+
+button {
+  padding: 2rem 3rem;
+  font-size: 2rem;
+  color: white;
+  background: darkcyan;
+  outline: none;
+  border: none;
+  border-radius: 6px;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+.descr {
+  font-size: 55px;
+}
